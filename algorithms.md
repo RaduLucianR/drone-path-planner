@@ -5,3 +5,5 @@ for Autonomous Mapping of Unknown Areas"
 "A review of path planning approaches for multiple mobile robots"
 3. [Fonseca](https://fenix.tecnico.ulisboa.pt/downloadFile/3096619880809376/Resumo%20Alargado%20-%2095789%20-Francisco%20Fonseca.pdf) 
 "Multi-Robot Informative Path Planning"
+4. [Jones et al](https://arxiv.org/pdf/1301.7482)  "Technical Report: A Receding Horizon Algorithm for Informative Path
+Planning with Temporal Logic Constraints"
