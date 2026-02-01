@@ -1,6 +1,7 @@
 mod algorithms;
 mod map;
 mod utils;
+mod visualize;
 
 use std::error::Error;
 use std::fs;
@@ -8,6 +9,7 @@ use std::fs;
 use algorithms::greedy_lookahead::plan_path;
 use map::GridMap;
 use utils::Config;
+use visualize::draw_grid_with_path;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let default_config_path = "./config/config.toml";
@@ -26,6 +28,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         4,
     );
 
+    let _ = draw_grid_with_path(&grid_map, &path, "output.png");
     println!("Score: {}", grid_map.get_path_score(path));
 
     Ok(())

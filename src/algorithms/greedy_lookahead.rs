@@ -58,6 +58,7 @@ pub fn plan_path(
 
     for _step in 0..discrete_steps_count {
         if start_time.elapsed() > max_duration {
+            println!("Time limit exceeded, exiting...");
             break;
         }
 

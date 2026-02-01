@@ -92,6 +92,13 @@ impl GridMap {
             .map(|cell| cell.current)
     }
 
+    pub fn get_original(&self, x: usize, y: usize) -> Option<i32> {
+        self.grid
+            .get(x)
+            .and_then(|row| row.get(y))
+            .map(|c| c.original)
+    }
+
     pub fn get_path_score(&self, path: Vec<Position>) -> i32 {
         let mut score = 0;
         for pos in path {
