@@ -4,8 +4,8 @@ use std::path::Path;
 
 #[derive(Debug)]
 pub struct GridMap {
-    pub size: usize,
-    pub grid: Vec<Vec<i32>>,
+    size: usize,
+    grid: Vec<Vec<i32>>,
 }
 
 impl GridMap {
@@ -54,5 +54,13 @@ impl GridMap {
             }
             println!();
         }
+    }
+
+    pub fn get_size(&self) -> usize {
+        self.size
+    }
+
+    pub fn get(&self, x: usize, y: usize) -> Option<i32> {
+        self.grid.get(x).and_then(|row| row.get(y)).copied()
     }
 }
