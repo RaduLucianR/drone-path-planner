@@ -9,7 +9,8 @@ use std::fs;
 use std::fs::File;
 use std::io::Write;
 
-use algorithms::greedy_lookahead::plan_path;
+use algorithms::greedy_lookahead::greedy_lookahead;
+use algorithms::PathPlanningAlgorithm;
 use map::GridMap;
 use utils::Config;
 use visualize::draw_grid_with_path;
@@ -25,12 +26,13 @@ fn main() -> Result<(), Box<dyn Error>> {
         config.map_params.replenish_rate,
     )?;
 
-    let path = plan_path(
+    let algorithm = PathPlanningAlgorithm::GreedyLookahead { lookahead: 4 };
+
+    let path = algorithm.plan_path(
         &mut grid_map,
         config.path_planning_params.discrete_steps_count,
         config.path_planning_params.maximum_duration_millis,
         config.path_planning_params.starting_position,
-        4,
     );
 
     let now = chrono::offset::Local::now();

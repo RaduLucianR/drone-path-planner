@@ -37,7 +37,7 @@ fn score_move(
     best
 }
 
-pub fn plan_path(
+pub fn greedy_lookahead(
     grid_map: &mut GridMap,
     discrete_steps_count: u32,
     maximum_duration_millis: u64,
