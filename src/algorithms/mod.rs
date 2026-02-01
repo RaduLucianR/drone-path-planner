@@ -9,7 +9,7 @@ use crate::utils::{PathPlanningParams, Position};
 
 pub enum PathPlanningAlgorithm {
     GreedyLookahead { lookahead: usize },
-    LimitedBeamSearch { lookahead: usize, beam_width: u32 },
+    LimitedBeamSearch { lookahead: usize, beam_width: usize },
 }
 
 impl PathPlanningAlgorithm {
@@ -48,7 +48,14 @@ impl PathPlanningAlgorithm {
             Self::LimitedBeamSearch {
                 lookahead,
                 beam_width,
-            } => limited_beam_search(),
+            } => limited_beam_search(
+                grid_map,
+                discrete_steps_count,
+                maximum_duration_millis,
+                start,
+                *lookahead,
+                *beam_width,
+            ),
         }
     }
 }

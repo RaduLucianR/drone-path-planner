@@ -9,7 +9,7 @@ pub struct Position {
 #[derive(Debug, Deserialize, Clone, Copy)]
 pub struct AlgoSpecificParams {
     pub lookahead: Option<usize>,
-    pub beam_width: Option<u32>,
+    pub beam_width: Option<usize>,
 }
 
 impl AlgoSpecificParams {
@@ -18,7 +18,7 @@ impl AlgoSpecificParams {
             .ok_or("Parameter lookahead must be provided".to_string())
     }
 
-    pub fn require_beam_width(&self) -> Result<u32, String> {
+    pub fn require_beam_width(&self) -> Result<usize, String> {
         self.beam_width
             .ok_or("Parameter beam_width must be provided".to_string())
     }
