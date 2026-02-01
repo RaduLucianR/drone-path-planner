@@ -2,19 +2,29 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
+#[derive(Debug, Clone, Copy)]
+pub struct Cell {
+    original: i32,
+    current: i32,
+}
+
 #[derive(Debug)]
 pub struct GridMap {
     size: usize,
-    grid: Vec<Vec<i32>>,
+    replenish_rate: f32,
+    grid: Vec<Vec<Cell>>,
 }
 
 impl GridMap {
-    pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Self, Box<dyn std::error::Error>> {
+    pub fn from_file<P: AsRef<Path>>(
+        path: P,
+        replenish_rate: f32,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
         let file = File::open(path)?;
         let reader = io::BufReader::new(file);
         let last_row_length: Option<usize> = None;
 
-        let mut grid: Vec<Vec<i32>> = Vec::new();
+        let mut grid: Vec<Vec<Cell>> = Vec::new();
 
         for (line_number, line) in reader.lines().enumerate() {
             let line = line?;
@@ -23,9 +33,14 @@ impl GridMap {
                 continue;
             }
 
-            let row: Vec<i32> = line
+            let row: Vec<Cell> = line
                 .split_whitespace()
-                .map(|s| s.parse::<i32>())
+                .map(|string| {
+                    string.parse::<i32>().map(|value| Cell {
+                        original: value,
+                        current: value,
+                    })
+                })
                 .collect::<Result<_, _>>()?;
 
             if let Some(len) = last_row_length {
@@ -44,13 +59,21 @@ impl GridMap {
         }
 
         let size = grid.len();
-        Ok(GridMap { size, grid })
+        Ok(GridMap {
+            size,
+            grid,
+            replenish_rate,
+        })
     }
 
-    pub fn print(&self) {
+    pub fn print(&self, original: bool) {
         for row in &self.grid {
-            for elem in row {
-                print!("{} ", elem);
+            for cell in row {
+                if original {
+                    print!("{} ", cell.original);
+                } else {
+                    print!("{} ", cell.current);
+                }
             }
             println!();
         }
@@ -61,6 +84,27 @@ impl GridMap {
     }
 
     pub fn get(&self, x: usize, y: usize) -> Option<i32> {
-        self.grid.get(x).and_then(|row| row.get(y)).copied()
+        self.grid
+            .get(x)
+            .and_then(|row| row.get(y))
+            .map(|cell| cell.current)
+    }
+
+    pub fn visit(&mut self, x: usize, y: usize) {
+        if let Some(row) = self.grid.get_mut(x) {
+            if let Some(cell) = row.get_mut(y) {
+                cell.current = 0;
+            }
+        }
+    }
+
+    pub fn replenish(&mut self) {
+        for row in &mut self.grid {
+            for cell in row {
+                cell.current = ((cell.current as f32 + self.replenish_rate * cell.original as f32)
+                    .round() as i32)
+                    .min(cell.original);
+            }
+        }
     }
 }

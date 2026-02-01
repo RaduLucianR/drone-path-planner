@@ -14,15 +14,15 @@ pub struct PathPlanningParams {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct Files {
+pub struct MapParams {
     pub map_file_path: String,
-    pub output_folder_path: String,
+    pub replenish_rate: f32,
 }
 
 #[derive(Deserialize, Debug)]
 pub struct Config {
     #[serde(rename = "path_planning_params")]
     pub path_planning_params: PathPlanningParams,
-    #[serde(rename = "files")]
-    pub files: Files,
+    #[serde(rename = "map_params")]
+    pub map_params: MapParams,
 }
