@@ -3,8 +3,11 @@ mod map;
 mod utils;
 mod visualize;
 
+use chrono;
 use std::error::Error;
 use std::fs;
+use std::fs::File;
+use std::io::Write;
 
 use algorithms::greedy_lookahead::plan_path;
 use map::GridMap;
@@ -13,6 +16,8 @@ use visualize::draw_grid_with_path;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let default_config_path = "./config/config.toml";
+    let default_output_folder_path = "./output/";
+
     let config_str = fs::read_to_string(default_config_path)?;
     let config: Config = toml::from_str(&config_str)?;
     let mut grid_map = GridMap::from_file(
@@ -28,8 +33,21 @@ fn main() -> Result<(), Box<dyn Error>> {
         4,
     );
 
-    let _ = draw_grid_with_path(&grid_map, &path, "output.png");
-    println!("Score: {}", grid_map.get_path_score(path));
+    let now = chrono::offset::Local::now();
+    let now_str = now.format("%Y%m%d_%H%M%S");
+    let png_output_file_name = format!("{}{}.png", default_output_folder_path, now_str);
+    let txt_output_file_name = format!("{}{}.txt", default_output_folder_path, now_str);
+    let _ = draw_grid_with_path(&grid_map, &path, &png_output_file_name);
+
+    let score = grid_map.get_path_score(&path);
+    println!("Score: {}", score);
+
+    let mut txt_file = File::create(txt_output_file_name)?;
+    let mut output_str = format!("{} {}\n", score, path.len());
+    for pos in path {
+        output_str += &format!("{} {}\n", pos.x, pos.y);
+    }
+    txt_file.write(output_str.as_bytes())?;
 
     Ok(())
 }

@@ -99,7 +99,7 @@ impl GridMap {
             .map(|c| c.original)
     }
 
-    pub fn get_path_score(&self, path: Vec<Position>) -> i32 {
+    pub fn get_path_score(&self, path: &Vec<Position>) -> i32 {
         let mut score = 0;
         for pos in path {
             if let Some(val) = self
