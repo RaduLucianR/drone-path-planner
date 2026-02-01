@@ -1,22 +1,22 @@
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Copy)]
 pub struct Position {
-    pub x: u32,
-    pub y: u32,
+    pub x: usize,
+    pub y: usize,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct PathPlanningParams {
-    pub maximum_duration_millis: u32,
-    pub discrete_steps_count: usize,
+    pub maximum_duration_millis: u64,
+    pub discrete_steps_count: u32,
     pub starting_position: Position,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct MapParams {
     pub map_file_path: String,
-    pub replenish_rate: f32,
+    pub replenish_rate: i32,
 }
 
 #[derive(Deserialize, Debug)]

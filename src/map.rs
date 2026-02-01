@@ -2,6 +2,8 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
+use crate::utils::Position;
+
 #[derive(Debug, Clone, Copy)]
 pub struct Cell {
     original: i32,
@@ -11,14 +13,14 @@ pub struct Cell {
 #[derive(Debug)]
 pub struct GridMap {
     size: usize,
-    replenish_rate: f32,
+    replenish_rate: i32,
     grid: Vec<Vec<Cell>>,
 }
 
 impl GridMap {
     pub fn from_file<P: AsRef<Path>>(
         path: P,
-        replenish_rate: f32,
+        replenish_rate: i32,
     ) -> Result<Self, Box<dyn std::error::Error>> {
         let file = File::open(path)?;
         let reader = io::BufReader::new(file);
@@ -90,6 +92,21 @@ impl GridMap {
             .map(|cell| cell.current)
     }
 
+    pub fn get_path_score(&self, path: Vec<Position>) -> i32 {
+        let mut score = 0;
+        for pos in path {
+            if let Some(val) = self
+                .grid
+                .get(pos.x)
+                .and_then(|row| row.get(pos.y))
+                .map(|cell| cell.original)
+            {
+                score += val;
+            }
+        }
+        score
+    }
+
     pub fn visit(&mut self, x: usize, y: usize) {
         if let Some(row) = self.grid.get_mut(x) {
             if let Some(cell) = row.get_mut(y) {
@@ -101,9 +118,8 @@ impl GridMap {
     pub fn replenish(&mut self) {
         for row in &mut self.grid {
             for cell in row {
-                cell.current = ((cell.current as f32 + self.replenish_rate * cell.original as f32)
-                    .round() as i32)
-                    .min(cell.original);
+                cell.current =
+                    (cell.current + self.replenish_rate * cell.original).min(cell.original);
             }
         }
     }

@@ -4,5 +4,5 @@ discrete_steps_count = 20      # i.e., t = Total number of discrete time steps
 starting_position = [0, 0]     # i.e, (x,y) = Index of drone starting position
 
 [map_params]
-replenish_rate = 0.1 # i.e., the rate at which already-visited cells are replenished to their original value, per step
+replenish_rate = 1 # i.e., the rate at which already-visited cells are replenished to their original value, per step
 map_file_path = "./grids/20.txt"
