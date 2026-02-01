@@ -1,0 +1,4 @@
+[path_planning_params]
+maximum_duration_millis = 1000 # i.e., T = Maximum duration of the algorithm in milliseconds
+discrete_steps_count = 20     # i.e., t = Total number of discrete time steps
+starting_position = [0, 0]    # i.e, (x,y) = Index of drone starting position
