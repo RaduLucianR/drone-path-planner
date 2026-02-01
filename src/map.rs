@@ -70,14 +70,17 @@ impl GridMap {
 
     pub fn print(&self, original: bool) {
         for row in &self.grid {
-            for cell in row {
-                if original {
-                    print!("{} ", cell.original);
-                } else {
-                    print!("{} ", cell.current);
-                }
-            }
-            println!();
+            let line: String = row
+                .iter()
+                .map(|cell| {
+                    if original {
+                        format!("{} ", cell.original)
+                    } else {
+                        format!("{} ", cell.current)
+                    }
+                })
+                .collect();
+            log::debug!("{}", line.trim_end());
         }
     }
 
@@ -129,5 +132,61 @@ impl GridMap {
                     (cell.current + self.replenish_rate * cell.original).min(cell.original);
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_from_file_valid() {
+        let grid = GridMap::from_file("grids/test_3x3.txt", 0.1).unwrap();
+        assert_eq!(grid.get_size(), 3);
+        assert_eq!(grid.get(0, 0), Some(1.0));
+        assert_eq!(grid.get(1, 1), Some(5.0));
+        assert_eq!(grid.get(2, 2), Some(9.0));
+    }
+
+    #[test]
+    fn test_get_and_visit() {
+        let mut grid = GridMap::from_file("grids/test_3x3.txt", 0.1).unwrap();
+
+        assert_eq!(grid.get(1, 1), Some(5.0));
+        grid.visit(1, 1);
+        assert_eq!(grid.get(1, 1), Some(0.0));
+        assert_eq!(grid.get_original(1, 1), Some(5.0));
+    }
+
+    #[test]
+    fn test_replenish() {
+        let mut grid = GridMap::from_file("grids/test_3x3.txt", 0.5).unwrap();
+
+        grid.visit(1, 1);
+        assert_eq!(grid.get(1, 1), Some(0.0));
+
+        grid.replenish();
+        assert_eq!(grid.get(1, 1), Some(2.5)); // 0.5 * 5.0 = 2.5
+
+        grid.replenish();
+        assert_eq!(grid.get(1, 1), Some(5.0)); // 2.5 + 2.5 = 5.0, capped at original
+    }
+
+    #[test]
+    fn test_get_path_score() {
+        let grid = GridMap::from_file("grids/test_3x3.txt", 0.1).unwrap();
+        let path = vec![
+            Position { x: 0, y: 0 },
+            Position { x: 1, y: 1 },
+            Position { x: 2, y: 2 },
+        ];
+        assert_eq!(grid.get_path_score(&path), 15.0); // 1 + 5 + 9
+    }
+
+    #[test]
+    fn test_out_of_bounds() {
+        let grid = GridMap::from_file("grids/test_3x3.txt", 0.1).unwrap();
+        assert_eq!(grid.get(10, 10), None);
+        assert_eq!(grid.get_original(10, 10), None);
     }
 }

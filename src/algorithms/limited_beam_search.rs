@@ -73,7 +73,7 @@ pub fn limited_beam_search(
 
     for _step in 0..discrete_steps_count {
         if start_time.elapsed() > max_duration {
-            println!("Time limit exceeded, exiting...");
+            log::warn!("Time limit exceeded, exiting...");
             break;
         }
 
@@ -127,4 +127,73 @@ pub fn limited_beam_search(
     }
 
     path
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::map::GridMap;
+
+    #[test]
+    fn test_in_bounds() {
+        assert!(in_bounds(0, 0, 10));
+        assert!(in_bounds(5, 5, 10));
+        assert!(in_bounds(9, 9, 10));
+        assert!(!in_bounds(-1, 0, 10));
+        assert!(!in_bounds(0, -1, 10));
+        assert!(!in_bounds(10, 0, 10));
+        assert!(!in_bounds(0, 10, 10));
+    }
+
+    #[test]
+    fn test_beam_search_basic_path() {
+        let mut grid = GridMap::from_file("grids/test_3x3.txt", 0.0).unwrap();
+        let start = Position { x: 0, y: 0 };
+        let path = limited_beam_search(&mut grid, 5, 10000, start, 2, 2);
+
+        assert!(!path.is_empty());
+        assert_eq!(path[0].x, 0);
+        assert_eq!(path[0].y, 0);
+    }
+
+    #[test]
+    fn test_beam_search_respects_step_limit() {
+        let mut grid = GridMap::from_file("grids/test_3x3.txt", 0.0).unwrap();
+        let start = Position { x: 1, y: 1 };
+        let path = limited_beam_search(&mut grid, 3, 10000, start, 2, 2);
+
+        // Path length is start + steps taken (up to discrete_steps_count)
+        assert!(path.len() <= 4); // start + 3 steps max
+    }
+
+    #[test]
+    fn test_beam_search_moves_to_high_value() {
+        let mut grid = GridMap::from_file("grids/test_3x3.txt", 0.0).unwrap();
+        // Start at (0,0) which has value 1.0
+        // Adjacent cells: (0,1)=2.0, (1,0)=4.0, (1,1)=5.0
+        // Should move toward higher values
+        let start = Position { x: 0, y: 0 };
+        let path = limited_beam_search(&mut grid, 1, 10000, start, 2, 2);
+
+        assert_eq!(path.len(), 2);
+        // With lookahead, it should pick the move that leads to best future value
+        assert_eq!(path[1].x, 1);
+        assert_eq!(path[1].y, 1);
+    }
+
+    #[test]
+    fn test_beam_width_affects_search() {
+        // With beam_width=1, only the single best candidate is explored at each depth
+        // With beam_width=8, all candidates are explored (like greedy_lookahead)
+        let mut grid1 = GridMap::from_file("grids/test_3x3.txt", 0.0).unwrap();
+        let mut grid2 = GridMap::from_file("grids/test_3x3.txt", 0.0).unwrap();
+
+        let start = Position { x: 1, y: 1 };
+        let path_narrow = limited_beam_search(&mut grid1, 2, 10000, start, 3, 1);
+        let path_wide = limited_beam_search(&mut grid2, 2, 10000, start, 3, 8);
+
+        // Both should produce valid paths
+        assert!(!path_narrow.is_empty());
+        assert!(!path_wide.is_empty());
+    }
 }

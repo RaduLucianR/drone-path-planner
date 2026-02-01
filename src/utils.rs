@@ -47,3 +47,44 @@ pub struct Config {
     #[serde(rename = "map_params")]
     pub map_params: MapParams,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_require_lookahead_present() {
+        let params = AlgoSpecificParams {
+            lookahead: Some(5),
+            beam_width: None,
+        };
+        assert_eq!(params.require_lookahead().unwrap(), 5);
+    }
+
+    #[test]
+    fn test_require_lookahead_missing() {
+        let params = AlgoSpecificParams {
+            lookahead: None,
+            beam_width: None,
+        };
+        assert!(params.require_lookahead().is_err());
+    }
+
+    #[test]
+    fn test_require_beam_width_present() {
+        let params = AlgoSpecificParams {
+            lookahead: None,
+            beam_width: Some(3),
+        };
+        assert_eq!(params.require_beam_width().unwrap(), 3);
+    }
+
+    #[test]
+    fn test_require_beam_width_missing() {
+        let params = AlgoSpecificParams {
+            lookahead: None,
+            beam_width: None,
+        };
+        assert!(params.require_beam_width().is_err());
+    }
+}

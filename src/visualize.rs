@@ -18,7 +18,7 @@ pub fn draw_grid_with_path(
     filename: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
     if path.len() == 0 {
-        println!("The path given for visualization has length zero! Exiting early.");
+        log::warn!("The path given for visualization has length zero! Exiting early.");
         return Ok(());
     }
 

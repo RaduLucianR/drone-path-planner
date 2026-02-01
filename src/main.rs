@@ -15,6 +15,8 @@ use utils::Config;
 use visualize::draw_grid_with_path;
 
 fn main() -> Result<(), Box<dyn Error>> {
+    env_logger::init();
+
     let default_config_path = "./config/config.toml";
     let default_output_folder_path = "./output/";
 
@@ -45,7 +47,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let _ = draw_grid_with_path(&grid_map, &path, &png_output_file_name);
 
     let score = grid_map.get_path_score(&path);
-    println!("Score: {}", score);
+    log::info!("Score: {}", score);
 
     let mut txt_file = File::create(txt_output_file_name)?;
     let mut output_str = format!("{} {}\n", score, path.len());
