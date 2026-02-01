@@ -14,7 +14,7 @@ pub fn draw_grid_with_path(
     root.fill(&WHITE)?;
 
     // Normalize colors using original values
-    let mut max_val = 1;
+    let mut max_val: f32 = 1.0;
     for x in 0..n {
         for y in 0..n {
             if let Some(v) = grid.get_original(x, y) {
@@ -25,28 +25,28 @@ pub fn draw_grid_with_path(
 
     let mut chart = ChartBuilder::on(&root)
         .margin(20)
-        .build_cartesian_2d(0f64..n as f64, (n as f64)..0f64)?;
+        .build_cartesian_2d(0f32..n as f32, (n as f32)..0f32)?;
 
     chart.configure_mesh().disable_mesh().draw()?;
 
     // Heatmap
     for x in 0..n {
         for y in 0..n {
-            let value = grid.get_original(x, y).unwrap_or(0) as f64 / max_val as f64;
+            let value = grid.get_original(x, y).unwrap_or(0.0) as f32 / max_val as f32;
 
             let color = RGBColor(255, (200.0 * (1.0 - value)) as u8, 0);
 
             chart.draw_series(std::iter::once(Rectangle::new(
-                [(y as f64, x as f64), (y as f64 + 1.0, x as f64 + 1.0)],
+                [(y as f32, x as f32), (y as f32 + 1.0, x as f32 + 1.0)],
                 color.filled(),
             )))?;
         }
     }
 
     // Path overlay through cell centers
-    let path_points: Vec<(f64, f64)> = path
+    let path_points: Vec<(f32, f32)> = path
         .iter()
-        .map(|p| (p.y as f64 + 0.5, p.x as f64 + 0.5))
+        .map(|p| (p.y as f32 + 0.5, p.x as f32 + 0.5))
         .collect();
 
     chart.draw_series(LineSeries::new(path_points.clone(), &CYAN))?;

@@ -12,12 +12,12 @@ fn score_move(
     y: usize,
     depth: usize,
     directions: &[(isize, isize)],
-) -> i32 {
+) -> f32 {
     if depth == 0 {
-        return 0;
+        return 0.0;
     }
 
-    let mut best = 0;
+    let mut best: f32 = 0.0;
 
     for &(dx, dy) in directions {
         let nx = x as isize + dx;
@@ -29,7 +29,7 @@ fn score_move(
             continue;
         }
 
-        let val = grid_map.get(nx as usize, ny as usize).unwrap_or(0);
+        let val = grid_map.get(nx as usize, ny as usize).unwrap_or(0.0);
         let future = score_move(grid_map, nx as usize, ny as usize, depth - 1, directions);
         best = best.max(val + future);
     }
@@ -65,7 +65,7 @@ pub fn plan_path(
         grid_map.replenish();
 
         let mut best_move: Option<Position> = None;
-        let mut best_value = i32::MIN;
+        let mut best_value = f32::MIN;
 
         for &(dx, dy) in &directions {
             let nx = x as isize + dx;
@@ -78,7 +78,7 @@ pub fn plan_path(
             let nx_usize = nx as usize;
             let ny_usize = ny as usize;
 
-            let immediate = grid_map.get(nx_usize, ny_usize).unwrap_or(0);
+            let immediate = grid_map.get(nx_usize, ny_usize).unwrap_or(0.0);
             let future = score_move(grid_map, nx_usize, ny_usize, lookahead - 1, &directions);
             let total = immediate + future;
 

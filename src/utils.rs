@@ -16,7 +16,7 @@ pub struct PathPlanningParams {
 #[derive(Debug, Deserialize)]
 pub struct MapParams {
     pub map_file_path: String,
-    pub replenish_rate: i32,
+    pub replenish_rate: f32,
 }
 
 #[derive(Deserialize, Debug)]

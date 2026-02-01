@@ -6,21 +6,21 @@ use crate::utils::Position;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Cell {
-    original: i32,
-    current: i32,
+    original: f32,
+    current: f32,
 }
 
 #[derive(Debug)]
 pub struct GridMap {
     size: usize,
-    replenish_rate: i32,
+    replenish_rate: f32,
     grid: Vec<Vec<Cell>>,
 }
 
 impl GridMap {
     pub fn from_file<P: AsRef<Path>>(
         path: P,
-        replenish_rate: i32,
+        replenish_rate: f32,
     ) -> Result<Self, Box<dyn std::error::Error>> {
         let file = File::open(path)?;
         let reader = io::BufReader::new(file);
@@ -38,7 +38,7 @@ impl GridMap {
             let row: Vec<Cell> = line
                 .split_whitespace()
                 .map(|string| {
-                    string.parse::<i32>().map(|value| Cell {
+                    string.parse::<f32>().map(|value| Cell {
                         original: value,
                         current: value,
                     })
@@ -85,22 +85,22 @@ impl GridMap {
         self.size
     }
 
-    pub fn get(&self, x: usize, y: usize) -> Option<i32> {
+    pub fn get(&self, x: usize, y: usize) -> Option<f32> {
         self.grid
             .get(x)
             .and_then(|row| row.get(y))
             .map(|cell| cell.current)
     }
 
-    pub fn get_original(&self, x: usize, y: usize) -> Option<i32> {
+    pub fn get_original(&self, x: usize, y: usize) -> Option<f32> {
         self.grid
             .get(x)
             .and_then(|row| row.get(y))
             .map(|c| c.original)
     }
 
-    pub fn get_path_score(&self, path: &Vec<Position>) -> i32 {
-        let mut score = 0;
+    pub fn get_path_score(&self, path: &Vec<Position>) -> f32 {
+        let mut score = 0.0;
         for pos in path {
             if let Some(val) = self
                 .grid
@@ -117,7 +117,7 @@ impl GridMap {
     pub fn visit(&mut self, x: usize, y: usize) {
         if let Some(row) = self.grid.get_mut(x) {
             if let Some(cell) = row.get_mut(y) {
-                cell.current = 0;
+                cell.current = 0.0;
             }
         }
     }
