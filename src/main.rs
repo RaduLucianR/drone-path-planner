@@ -9,7 +9,6 @@ use std::fs;
 use std::fs::File;
 use std::io::Write;
 
-use algorithms::greedy_lookahead::greedy_lookahead;
 use algorithms::PathPlanningAlgorithm;
 use map::GridMap;
 use utils::Config;
@@ -26,7 +25,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         config.map_params.replenish_rate,
     )?;
 
-    let algorithm = PathPlanningAlgorithm::GreedyLookahead { lookahead: 4 };
+    let algorithm = PathPlanningAlgorithm::from_config(&config.path_planning_params)?;
 
     let path = algorithm.plan_path(
         &mut grid_map,
@@ -34,6 +33,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         config.path_planning_params.maximum_duration_millis,
         config.path_planning_params.starting_position,
     );
+
+    if path.len() == 0 {
+        return Ok(());
+    }
 
     let now = chrono::offset::Local::now();
     let now_str = now.format("%Y%m%d_%H%M%S");

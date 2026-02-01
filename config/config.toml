@@ -3,8 +3,8 @@ maximum_duration_millis = 1000 # i.e., T = Maximum duration of the algorithm in 
 discrete_steps_count = 1000      # i.e., t = Total number of discrete time steps
 starting_position = [20, 20]     # i.e, (x,y) = Index of drone starting position
 algorithm = "greedy_lookahead"
-algorithm_specific_paramters = {
-    lookahead = 4
+algorithm_specific_parameters = {
+    lookahead = 4,
 }
 
 [map_params]

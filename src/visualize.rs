@@ -5,9 +5,14 @@ use plotters::prelude::*;
 
 pub fn draw_grid_with_path(
     grid: &GridMap,
-    path: &[Position],
+    path: &Vec<Position>,
     filename: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
+    if path.len() == 0 {
+        println!("The path given for visualization has length zero! Exiting early.");
+        return Ok(());
+    }
+
     let n = grid.get_size();
 
     let root = BitMapBackend::new(filename, (600, 600)).into_drawing_area();
