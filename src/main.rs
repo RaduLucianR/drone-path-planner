@@ -1,18 +1,10 @@
-mod algorithms;
-mod map;
-mod utils;
-mod visualize;
-
 use chrono;
 use std::error::Error;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
 
-use algorithms::PathPlanningAlgorithm;
-use map::GridMap;
-use utils::Config;
-use visualize::draw_grid_with_path;
+use drone_path_planner::{Config, GridMap, PathPlanningAlgorithm, draw_grid_with_path};
 
 fn main() -> Result<(), Box<dyn Error>> {
     fern::Dispatch::new()

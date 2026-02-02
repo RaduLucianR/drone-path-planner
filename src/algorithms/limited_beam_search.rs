@@ -59,10 +59,11 @@ pub fn limited_beam_search(
     let mut x = start.x;
     let mut y = start.y;
 
-    let directions: Vec<(isize, isize)> = (-1..=1)
-        .flat_map(|dx| (-1..=1).map(move |dy| (dx, dy)))
-        .filter(|&(dx, dy)| !(dx == 0 && dy == 0))
-        .collect();
+    let directions: Vec<(isize, isize)> = vec![
+        (-1, -1), (-1, 0), (-1, 1),
+        ( 0, -1),          ( 0, 1),
+        ( 1, -1), ( 1, 0), ( 1, 1),
+    ];
 
     let start_time = Instant::now();
     let max_duration = Duration::from_millis(maximum_duration_millis);

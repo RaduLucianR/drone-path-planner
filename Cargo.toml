@@ -3,6 +3,14 @@ name = "drone-path-planner"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "drone_path_planner"
+path = "src/lib.rs"
+
+[[bin]]
+name = "drone-path-planner"
+path = "src/main.rs"
+
 [dependencies]
 chrono = "0.4.43"
 env_logger = "0.11"
