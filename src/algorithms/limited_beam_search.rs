@@ -6,7 +6,6 @@ fn in_bounds(nx: isize, ny: isize, bound: isize) -> bool {
     nx >= 0 && ny >= 0 && nx < bound && ny < bound
 }
 
-// Beam search version of score_move
 fn beam_score_move(
     grid_map: &GridMap,
     x: usize,
@@ -19,7 +18,6 @@ fn beam_score_move(
         return 0.0;
     }
 
-    // Generate all candidates with their immediate values
     let mut candidates: Vec<(f32, usize, usize)> = Vec::new();
 
     for &(dx, dy) in directions {
@@ -37,11 +35,9 @@ fn beam_score_move(
         candidates.push((val, nx_usize, ny_usize));
     }
 
-    // BEAM SEARCH: Sort by value and keep only top beam_width
     candidates.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap());
     candidates.truncate(beam_width);
 
-    // Recursively explore only the best candidates
     let mut best: f32 = 0.0;
     for (val, nx, ny) in candidates {
         let future = beam_score_move(grid_map, nx, ny, depth - 1, beam_width, directions);

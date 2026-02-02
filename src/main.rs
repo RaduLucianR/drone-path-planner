@@ -15,7 +15,20 @@ use utils::Config;
 use visualize::draw_grid_with_path;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    env_logger::init();
+    fern::Dispatch::new()
+        .format(|out, message, record| {
+            out.finish(format_args!(
+                "{} [{}] {}",
+                chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
+                record.level(),
+                message
+            ))
+        })
+        .level(log::LevelFilter::Info)
+        .chain(std::io::stdout())
+        .chain(fern::log_file("output.log")?)
+        .apply()?;
+    log::info!("Starting process");
 
     let default_config_path = "./config/config.toml";
     let default_output_folder_path = "./output/";
