@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
@@ -15,6 +16,7 @@ pub struct GridMap {
     size: usize,
     replenish_rate: f32,
     grid: Vec<Vec<Cell>>,
+    visited_cells: HashSet<(usize, usize)>,
 }
 
 impl GridMap {
@@ -65,6 +67,7 @@ impl GridMap {
             size,
             grid,
             replenish_rate,
+            visited_cells: HashSet::new(),
         })
     }
 
@@ -121,16 +124,25 @@ impl GridMap {
         if let Some(row) = self.grid.get_mut(x) {
             if let Some(cell) = row.get_mut(y) {
                 cell.current = 0.0;
+                self.visited_cells.insert((x, y));
             }
         }
     }
 
     pub fn replenish(&mut self) {
-        for row in &mut self.grid {
-            for cell in row {
-                cell.current =
-                    (cell.current + self.replenish_rate * cell.original).min(cell.original);
+        let mut fully_replenished = Vec::new();
+
+        for &(x, y) in &self.visited_cells {
+            let cell = &mut self.grid[x][y];
+            cell.current = (cell.current + self.replenish_rate * cell.original).min(cell.original);
+
+            if (cell.current - cell.original).abs() < 0.001 {
+                fully_replenished.push((x, y));
             }
+        }
+
+        for pos in fully_replenished {
+            self.visited_cells.remove(&pos);
         }
     }
 }

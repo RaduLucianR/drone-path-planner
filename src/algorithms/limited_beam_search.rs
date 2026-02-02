@@ -1,5 +1,6 @@
 use crate::map::GridMap;
 use crate::utils::{in_bounds, PathScore, Position};
+use std::collections::HashMap;
 use std::time::{Duration, Instant};
 
 fn beam_score_move(
@@ -9,9 +10,15 @@ fn beam_score_move(
     depth: usize,
     beam_width: usize,
     directions: &[(isize, isize)],
+    cache: &mut HashMap<(usize, usize, usize), f32>,
 ) -> f32 {
     if depth == 0 {
         return 0.0;
+    }
+
+    let key = (x, y, depth);
+    if let Some(&cached) = cache.get(&key) {
+        return cached;
     }
 
     let mut candidates: Vec<(f32, usize, usize)> = Vec::new();
@@ -36,10 +43,11 @@ fn beam_score_move(
 
     let mut best: f32 = 0.0;
     for (val, nx, ny) in candidates {
-        let future = beam_score_move(grid_map, nx, ny, depth - 1, beam_width, directions);
+        let future = beam_score_move(grid_map, nx, ny, depth - 1, beam_width, directions, cache);
         best = best.max(val + future);
     }
 
+    cache.insert(key, best);
     best
 }
 
@@ -75,6 +83,7 @@ pub fn limited_beam_search(
 
         grid_map.replenish();
 
+        let mut cache: HashMap<(usize, usize, usize), f32> = HashMap::new();
         let mut best_move: Option<Position> = None;
         let mut best_value = f32::MIN;
 
@@ -91,7 +100,6 @@ pub fn limited_beam_search(
 
             let immediate = grid_map.get(nx_usize, ny_usize).unwrap_or(0.0);
 
-            // Use beam search instead of full lookahead
             let future = beam_score_move(
                 grid_map,
                 nx_usize,
@@ -99,6 +107,7 @@ pub fn limited_beam_search(
                 lookahead - 1,
                 beam_width,
                 &directions,
+                &mut cache,
             );
 
             let total = immediate + future;

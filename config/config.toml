@@ -5,8 +5,8 @@ starting_position = [50, 50]     # i.e, (x,y) = Index of drone starting position
 # algorithm = "limited_beam_search"
 # algorithm_specific_parameters = {lookahead = 15, beam_width = 2}
 algorithm = "greedy_lookahead"
-algorithm_specific_parameters = {lookahead = 4}
+algorithm_specific_parameters = {lookahead = 8}
 
 [map_params]
-replenish_rate = 0.001 # i.e., the rate at which already-visited cells are replenished to their original value, per step
+replenish_rate = 0.01 # i.e., the rate at which already-visited cells are replenished to their original value, per step
 map_file_path = "./grids/100.txt"

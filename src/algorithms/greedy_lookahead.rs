@@ -1,5 +1,6 @@
 use crate::map::GridMap;
 use crate::utils::{in_bounds, PathScore, Position};
+use std::collections::HashMap;
 use std::time::{Duration, Instant};
 
 fn score_move(
@@ -8,10 +9,16 @@ fn score_move(
     y: usize,
     depth: usize,
     directions: &[(isize, isize)],
-    deadline: Instant
+    deadline: Instant,
+    cache: &mut HashMap<(usize, usize, usize), f32>,
 ) -> f32 {
-    if depth == 0 || Instant::now() > deadline  {
+    if depth == 0 || Instant::now() > deadline {
         return 0.0;
+    }
+
+    let key = (x, y, depth);
+    if let Some(&cached) = cache.get(&key) {
+        return cached;
     }
 
     let mut best: f32 = 0.0;
@@ -20,17 +27,16 @@ fn score_move(
         let nx = x as isize + dx;
         let ny = y as isize + dy;
 
-        if !((0..grid_map.get_size() as isize).contains(&nx)
-            && (0..grid_map.get_size() as isize).contains(&ny))
-        {
+        if !in_bounds(nx, ny, grid_map.get_size()) {
             continue;
         }
 
         let val = grid_map.get(nx as usize, ny as usize).unwrap_or(0.0);
-        let future = score_move(grid_map, nx as usize, ny as usize, depth - 1, directions, deadline);
+        let future = score_move(grid_map, nx as usize, ny as usize, depth - 1, directions, deadline, cache);
         best = best.max(val + future);
     }
 
+    cache.insert(key, best);
     best
 }
 
@@ -66,6 +72,7 @@ pub fn greedy_lookahead(
 
         grid_map.replenish();
 
+        let mut cache: HashMap<(usize, usize, usize), f32> = HashMap::new();
         let mut best_move: Option<Position> = None;
         let mut best_value = f32::MIN;
 
@@ -81,7 +88,7 @@ pub fn greedy_lookahead(
             let ny_usize = ny as usize;
 
             let immediate = grid_map.get(nx_usize, ny_usize).unwrap_or(0.0);
-            let future = score_move(grid_map, nx_usize, ny_usize, lookahead - 1, &directions, deadline);
+            let future = score_move(grid_map, nx_usize, ny_usize, lookahead - 1, &directions, deadline, &mut cache);
             let total = immediate + future;
 
             if total > best_value {
