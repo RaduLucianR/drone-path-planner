@@ -71,7 +71,7 @@ pub fn draw_grid_with_path(
 
     chart.draw_series(LineSeries::new(
         path_points.clone(),
-        ShapeStyle::from(&RED).stroke_width(1),
+        ShapeStyle::from(&RED).stroke_width(2),
     ))?;
 
     chart.draw_series(std::iter::once(Circle::new(

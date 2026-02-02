@@ -8,8 +8,9 @@ fn score_move(
     y: usize,
     depth: usize,
     directions: &[(isize, isize)],
+    deadline: Instant
 ) -> f32 {
-    if depth == 0 {
+    if depth == 0 || deadline > Instant::now()  {
         return 0.0;
     }
 
@@ -26,7 +27,7 @@ fn score_move(
         }
 
         let val = grid_map.get(nx as usize, ny as usize).unwrap_or(0.0);
-        let future = score_move(grid_map, nx as usize, ny as usize, depth - 1, directions);
+        let future = score_move(grid_map, nx as usize, ny as usize, depth - 1, directions, deadline);
         best = best.max(val + future);
     }
 
@@ -52,6 +53,7 @@ pub fn greedy_lookahead(
 
     let start_time = Instant::now();
     let max_duration = Duration::from_millis(maximum_duration_millis);
+    let deadline = start_time + max_duration;
 
     for _step in 0..discrete_steps_count {
         if start_time.elapsed() > max_duration {
@@ -76,7 +78,7 @@ pub fn greedy_lookahead(
             let ny_usize = ny as usize;
 
             let immediate = grid_map.get(nx_usize, ny_usize).unwrap_or(0.0);
-            let future = score_move(grid_map, nx_usize, ny_usize, lookahead - 1, &directions);
+            let future = score_move(grid_map, nx_usize, ny_usize, lookahead - 1, &directions, deadline);
             let total = immediate + future;
 
             if total > best_value {
