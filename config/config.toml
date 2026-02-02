@@ -1,15 +1,12 @@
 [path_planning_params]
 maximum_duration_millis = 1000 # i.e., T = Maximum duration of the algorithm in milliseconds
-discrete_steps_count = 30      # i.e., t = Total number of discrete time steps
-starting_position = [0, 0]     # i.e, (x,y) = Index of drone starting position
+discrete_steps_count = 100      # i.e., t = Total number of discrete time steps
+starting_position = [50, 50]     # i.e, (x,y) = Index of drone starting position
 # algorithm = "limited_beam_search"
-# algorithm_specific_parameters = {
-#     lookahead = 8
-#     beam_width = 2
-# }
+# algorithm_specific_parameters = {lookahead = 15, beam_width = 2}
 algorithm = "greedy_lookahead"
 algorithm_specific_parameters = {lookahead = 4}
 
 [map_params]
 replenish_rate = 0.001 # i.e., the rate at which already-visited cells are replenished to their original value, per step
-map_file_path = "./grids/20_imbalanced.txt"
+map_file_path = "./grids/100.txt"

@@ -5,7 +5,7 @@ use crate::algorithms::{
     greedy_lookahead::greedy_lookahead, limited_beam_search::limited_beam_search,
 };
 use crate::map::GridMap;
-use crate::utils::{PathPlanningParams, Position};
+use crate::utils::{PathPlanningParams, PathScore, Position};
 
 #[derive(Debug)]
 pub enum PathPlanningAlgorithm {
@@ -37,7 +37,7 @@ impl PathPlanningAlgorithm {
         discrete_steps_count: u32,
         maximum_duration_millis: u64,
         start: Position,
-    ) -> Vec<Position> {
+    ) -> PathScore {
         match self {
             Self::GreedyLookahead { lookahead } => greedy_lookahead(
                 grid_map,

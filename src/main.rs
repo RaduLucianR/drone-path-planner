@@ -66,14 +66,14 @@ fn run(config_path: &str, no_png: bool) -> Result<(), String> {
 
     let algorithm = PathPlanningAlgorithm::from_config(&config.path_planning_params)?;
 
-    let path = algorithm.plan_path(
+    let result = algorithm.plan_path(
         &mut grid_map,
         config.path_planning_params.discrete_steps_count,
         config.path_planning_params.maximum_duration_millis,
         config.path_planning_params.starting_position,
     );
 
-    if path.is_empty() {
+    if result.path.is_empty() {
         log::warn!("No path was generated");
         return Ok(());
     }
@@ -84,18 +84,17 @@ fn run(config_path: &str, no_png: bool) -> Result<(), String> {
 
     if !no_png {
         let png_output_file_name = format!("{}{}.png", default_output_folder_path, now_str);
-        draw_grid_with_path(&grid_map, &path, &png_output_file_name)
+        draw_grid_with_path(&grid_map, &result.path, &png_output_file_name)
             .map_err(|e| format!("Failed to write PNG output '{}': {}", png_output_file_name, e))?;
     }
 
-    let score = grid_map.get_path_score(&path);
-    log::info!("Score: {}", score);
+    log::info!("Score: {}", result.score);
 
     let mut txt_file = File::create(&txt_output_file_name)
         .map_err(|e| format!("Failed to create output file '{}': {}", txt_output_file_name, e))?;
 
-    let mut output_str = format!("{} {}\n", score, path.len());
-    for pos in path {
+    let mut output_str = format!("{} {}\n", result.score, result.path.len());
+    for pos in &result.path {
         output_str += &format!("{} {}\n", pos.x, pos.y);
     }
 

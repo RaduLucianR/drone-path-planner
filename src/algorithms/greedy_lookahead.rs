@@ -1,5 +1,5 @@
 use crate::map::GridMap;
-use crate::utils::{in_bounds, Position};
+use crate::utils::{in_bounds, PathScore, Position};
 use std::time::{Duration, Instant};
 
 fn score_move(
@@ -10,7 +10,7 @@ fn score_move(
     directions: &[(isize, isize)],
     deadline: Instant
 ) -> f32 {
-    if depth == 0 || deadline > Instant::now()  {
+    if depth == 0 || Instant::now() > deadline  {
         return 0.0;
     }
 
@@ -40,8 +40,11 @@ pub fn greedy_lookahead(
     maximum_duration_millis: u64,
     start: Position,
     lookahead: usize,
-) -> Vec<Position> {
+) -> PathScore {
     let mut path = vec![start];
+    let mut total_score = grid_map.get(start.x, start.y).unwrap_or(0.0);
+    grid_map.visit(start.x, start.y);
+
     let mut x = start.x;
     let mut y = start.y;
 
@@ -91,6 +94,8 @@ pub fn greedy_lookahead(
         }
 
         if let Some(Position { x: nx, y: ny }) = best_move {
+            let collected = grid_map.get(nx, ny).unwrap_or(0.0);
+            total_score += collected;
             x = nx;
             y = ny;
             path.push(Position { x, y });
@@ -100,7 +105,7 @@ pub fn greedy_lookahead(
         }
     }
 
-    path
+    PathScore { path, score: total_score }
 }
 
 #[cfg(test)]
@@ -112,21 +117,22 @@ mod tests {
     fn test_greedy_basic_path() {
         let mut grid = GridMap::from_file("grids/test_3x3.txt", 0.0).unwrap();
         let start = Position { x: 0, y: 0 };
-        let path = greedy_lookahead(&mut grid, 5, 10000, start, 2);
+        let result = greedy_lookahead(&mut grid, 5, 10000, start, 2);
 
-        assert!(!path.is_empty());
-        assert_eq!(path[0].x, 0);
-        assert_eq!(path[0].y, 0);
+        assert!(!result.path.is_empty());
+        assert_eq!(result.path[0].x, 0);
+        assert_eq!(result.path[0].y, 0);
+        assert!(result.score > 0.0);
     }
 
     #[test]
     fn test_greedy_respects_step_limit() {
         let mut grid = GridMap::from_file("grids/test_3x3.txt", 0.0).unwrap();
         let start = Position { x: 1, y: 1 };
-        let path = greedy_lookahead(&mut grid, 3, 10000, start, 2);
+        let result = greedy_lookahead(&mut grid, 3, 10000, start, 2);
 
         // Path length is start + steps taken (up to discrete_steps_count)
-        assert!(path.len() <= 4); // start + 3 steps max
+        assert!(result.path.len() <= 4); // start + 3 steps max
     }
 
     #[test]
@@ -136,12 +142,12 @@ mod tests {
         // Adjacent cells: (0,1)=2.0, (1,0)=4.0, (1,1)=5.0
         // Should move toward higher values
         let start = Position { x: 0, y: 0 };
-        let path = greedy_lookahead(&mut grid, 1, 10000, start, 2);
+        let result = greedy_lookahead(&mut grid, 1, 10000, start, 2);
 
-        assert_eq!(path.len(), 2);
+        assert_eq!(result.path.len(), 2);
         // With lookahead, it should pick the move that leads to best future value
         // (1,1) has value 5.0 and is adjacent to 9.0
-        assert_eq!(path[1].x, 1);
-        assert_eq!(path[1].y, 1);
+        assert_eq!(result.path[1].x, 1);
+        assert_eq!(result.path[1].y, 1);
     }
 }

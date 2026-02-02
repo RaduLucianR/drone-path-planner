@@ -6,6 +6,12 @@ pub struct Position {
     pub y: usize,
 }
 
+#[derive(Debug, Clone)]
+pub struct PathScore {
+    pub path: Vec<Position>,
+    pub score: f32,
+}
+
 pub fn in_bounds(x: isize, y: isize, size: usize) -> bool {
     x >= 0 && y >= 0 && x < size as isize && y < size as isize
 }
