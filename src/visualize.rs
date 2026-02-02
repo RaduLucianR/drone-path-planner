@@ -54,7 +54,6 @@ pub fn draw_grid_with_path(
         for y in 0..n {
             let value = grid.get_original(x, y).unwrap_or(0.0) as f32 / max_val as f32;
 
-            // let color = RGBColor(255, (200.0 * (1.0 - value)) as u8, 0);
             let color = stepped_gray(value);
 
             chart.draw_series(std::iter::once(Rectangle::new(
@@ -72,7 +71,7 @@ pub fn draw_grid_with_path(
 
     chart.draw_series(LineSeries::new(
         path_points.clone(),
-        ShapeStyle::from(&CYAN).stroke_width(1),
+        ShapeStyle::from(&RED).stroke_width(1),
     ))?;
 
     chart.draw_series(std::iter::once(Circle::new(

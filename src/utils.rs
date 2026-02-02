@@ -6,6 +6,10 @@ pub struct Position {
     pub y: usize,
 }
 
+pub fn in_bounds(x: isize, y: isize, size: usize) -> bool {
+    x >= 0 && y >= 0 && x < size as isize && y < size as isize
+}
+
 #[derive(Debug, Deserialize, Clone, Copy)]
 pub struct AlgoSpecificParams {
     pub lookahead: Option<usize>,
@@ -51,6 +55,17 @@ pub struct Config {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_in_bounds() {
+        assert!(in_bounds(0, 0, 10));
+        assert!(in_bounds(5, 5, 10));
+        assert!(in_bounds(9, 9, 10));
+        assert!(!in_bounds(-1, 0, 10));
+        assert!(!in_bounds(0, -1, 10));
+        assert!(!in_bounds(10, 0, 10));
+        assert!(!in_bounds(0, 10, 10));
+    }
 
     #[test]
     fn test_require_lookahead_present() {

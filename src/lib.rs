@@ -5,5 +5,5 @@ pub mod visualize;
 
 pub use algorithms::PathPlanningAlgorithm;
 pub use map::GridMap;
-pub use utils::{Config, MapParams, PathPlanningParams, Position};
+pub use utils::{in_bounds, Config, MapParams, PathPlanningParams, Position};
 pub use visualize::draw_grid_with_path;

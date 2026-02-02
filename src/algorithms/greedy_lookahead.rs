@@ -1,10 +1,6 @@
 use crate::map::GridMap;
-use crate::utils::Position;
+use crate::utils::{in_bounds, Position};
 use std::time::{Duration, Instant};
-
-fn in_bounds(nx: isize, ny: isize, bound: isize) -> bool {
-    nx >= 0 && ny >= 0 && nx < bound && ny < bound
-}
 
 fn score_move(
     grid_map: &GridMap,
@@ -72,7 +68,7 @@ pub fn greedy_lookahead(
             let nx = x as isize + dx;
             let ny = y as isize + dy;
 
-            if !in_bounds(nx, ny, grid_map.get_size() as isize) {
+            if !in_bounds(nx, ny, grid_map.get_size()) {
                 continue;
             }
 
@@ -109,17 +105,6 @@ pub fn greedy_lookahead(
 mod tests {
     use super::*;
     use crate::map::GridMap;
-
-    #[test]
-    fn test_in_bounds() {
-        assert!(in_bounds(0, 0, 10));
-        assert!(in_bounds(5, 5, 10));
-        assert!(in_bounds(9, 9, 10));
-        assert!(!in_bounds(-1, 0, 10));
-        assert!(!in_bounds(0, -1, 10));
-        assert!(!in_bounds(10, 0, 10));
-        assert!(!in_bounds(0, 10, 10));
-    }
 
     #[test]
     fn test_greedy_basic_path() {
