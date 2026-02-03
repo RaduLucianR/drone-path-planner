@@ -21,6 +21,7 @@ fn beam_score_move(
         return cached;
     }
 
+    // Vec< score, x, y >
     let mut candidates: Vec<(f32, usize, usize)> = Vec::new();
 
     for &(dx, dy) in directions {
@@ -38,6 +39,7 @@ fn beam_score_move(
         candidates.push((val, nx_usize, ny_usize));
     }
 
+    // Sort the candidates by score in decreasing order
     candidates.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap());
     candidates.truncate(beam_width);
 
@@ -67,9 +69,14 @@ pub fn limited_beam_search(
     let mut y = start.y;
 
     let directions: Vec<(isize, isize)> = vec![
-        (-1, -1), (-1, 0), (-1, 1),
-        ( 0, -1),          ( 0, 1),
-        ( 1, -1), ( 1, 0), ( 1, 1),
+        (-1, -1),
+        (-1, 0),
+        (-1, 1),
+        (0, -1),
+        (0, 1),
+        (1, -1),
+        (1, 0),
+        (1, 1),
     ];
 
     let start_time = Instant::now();
@@ -133,7 +140,10 @@ pub fn limited_beam_search(
         }
     }
 
-    PathScore { path, score: total_score }
+    PathScore {
+        path,
+        score: total_score,
+    }
 }
 
 #[cfg(test)]

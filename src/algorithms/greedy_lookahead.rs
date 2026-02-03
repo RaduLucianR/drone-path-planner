@@ -32,7 +32,15 @@ fn score_move(
         }
 
         let val = grid_map.get(nx as usize, ny as usize).unwrap_or(0.0);
-        let future = score_move(grid_map, nx as usize, ny as usize, depth - 1, directions, deadline, cache);
+        let future = score_move(
+            grid_map,
+            nx as usize,
+            ny as usize,
+            depth - 1,
+            directions,
+            deadline,
+            cache,
+        );
         best = best.max(val + future);
     }
 
@@ -55,9 +63,14 @@ pub fn greedy_lookahead(
     let mut y = start.y;
 
     let directions: Vec<(isize, isize)> = vec![
-        (-1, -1), (-1, 0), (-1, 1),
-        ( 0, -1),          ( 0, 1),
-        ( 1, -1), ( 1, 0), ( 1, 1),
+        (-1, -1),
+        (-1, 0),
+        (-1, 1),
+        (0, -1),
+        (0, 1),
+        (1, -1),
+        (1, 0),
+        (1, 1),
     ];
 
     let start_time = Instant::now();
@@ -88,7 +101,15 @@ pub fn greedy_lookahead(
             let ny_usize = ny as usize;
 
             let immediate = grid_map.get(nx_usize, ny_usize).unwrap_or(0.0);
-            let future = score_move(grid_map, nx_usize, ny_usize, lookahead - 1, &directions, deadline, &mut cache);
+            let future = score_move(
+                grid_map,
+                nx_usize,
+                ny_usize,
+                lookahead - 1,
+                &directions,
+                deadline,
+                &mut cache,
+            );
             let total = immediate + future;
 
             if total > best_value {
@@ -112,7 +133,10 @@ pub fn greedy_lookahead(
         }
     }
 
-    PathScore { path, score: total_score }
+    PathScore {
+        path,
+        score: total_score,
+    }
 }
 
 #[cfg(test)]
